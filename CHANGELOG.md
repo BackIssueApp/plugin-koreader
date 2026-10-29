@@ -8,6 +8,8 @@ by the maintainers when changes merge, so concurrent PRs don't conflict here.
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-10-29
+
 ### Added
 
 - First release. A **KOReader** card on the Profile page hands out the device
