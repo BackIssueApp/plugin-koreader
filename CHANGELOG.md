@@ -17,3 +17,6 @@ by the maintainers when changes merge, so concurrent PRs don't conflict here.
   page), by percentage with the web reader. Books not downloaded through the
   plugin are recognised by a fingerprint of their first and last 64 KiB,
   computed on the server after each scan.
+- A fault inside the device plugin is shown as a message and written to
+  `backissue_crash.log` in KOReader's data folder, instead of taking KOReader
+  down with it.

@@ -673,4 +673,32 @@ function BackIssue:onCloseWidget()
     UIManager:unschedule(self.push_task)
 end
 
+-- A fault in the plugin must not take KOReader down with it: every entry
+-- point runs under xpcall, and an error is shown, logged and appended to
+-- backissue_crash.log in KOReader's data folder for reporting.
+local CRASH_LOG = DataStorage:getDataDir() .. "/backissue_crash.log"
+local function guard(fn)
+    return function(...)
+        local r = { xpcall(fn, debug.traceback, ...) }
+        if r[1] then return unpack(r, 2) end
+        local err = tostring(r[2])
+        logger.err("BackIssue:", err)
+        local f = io.open(CRASH_LOG, "a")
+        if f then
+            f:write(os.date("%Y-%m-%d %H:%M:%S"), " plugin ", PLUGIN_VERSION, "\n", err, "\n\n")
+            f:close()
+        end
+        UIManager:show(InfoMessage:new{
+            text = T(_("BackIssue ran into an error: %1\n\nDetails were written to %2"), err:match("^[^\n]*") or "?", CRASH_LOG),
+        })
+    end
+end
+for _i, name in ipairs({
+    "showBooks", "loadMore", "refreshList", "askSearch", "showBookInfo", "downloadBook",
+    "openBook", "testConnection", "editText", "pushProgress", "pullProgress",
+    "onReaderReady", "onCloseDocument", "onSuspend", "onResume", "onNetworkConnected",
+}) do
+    BackIssue[name] = guard(BackIssue[name])
+end
+
 return BackIssue

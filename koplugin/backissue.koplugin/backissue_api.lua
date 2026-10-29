@@ -13,6 +13,24 @@ local logger = require("logger")
 local json_ok, JSON = pcall(require, "rapidjson")
 if not json_ok then JSON = require("json") end
 
+-- rapidjson decodes a JSON null as a sentinel userdata, not as nil, so a
+-- book with no series would carry a value that passes `~= ""` and then
+-- fails to concatenate. Drop the sentinels so callers only ever see nil.
+local NULL = json_ok and JSON.null or nil
+local function withoutNulls(v)
+    if NULL ~= nil and v == NULL then return nil end
+    if type(v) == "table" then
+        for k, x in pairs(v) do
+            if NULL ~= nil and x == NULL then
+                v[k] = nil
+            elseif type(x) == "table" then
+                withoutNulls(x)
+            end
+        end
+    end
+    return v
+end
+
 local Api = {}
 Api.__index = Api
 
@@ -89,7 +107,7 @@ function Api:request(method, path, body)
     local decoded
     if text ~= "" then
         local dok, d = pcall(JSON.decode, text)
-        if dok then decoded = d end
+        if dok then decoded = withoutNulls(d) end
     end
     if type(code) ~= "number" or code < 200 or code >= 300 then
         logger.warn("BackIssue: HTTP", code, method, u)
