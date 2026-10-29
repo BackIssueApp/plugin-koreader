@@ -374,13 +374,19 @@ function BackIssue:showBooks(opts)
         title_bar_fm_style = true,
         title_bar_left_icon = "appbar.search",
         onLeftButtonTap = function() self:askSearch() end,
+        -- A tap acts on the book and keeps the list open (Menu's own
+        -- onMenuSelect would run close_callback after every choice).
+        onMenuSelect = function(_menu, item)
+            if item.callback then item.callback() end
+            return true
+        end,
         onMenuHold = function(_menu, item)
             if item.book then self:showBookInfo(item.book) end
             return true
         end,
         close_callback = function()
-            if self.menu then UIManager:close(self.menu) end
             self.menu = nil
+            self.list_state = nil
         end,
     }
     UIManager:show(self.menu)
