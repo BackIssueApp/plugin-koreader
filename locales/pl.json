@@ -1,0 +1,28 @@
+{
+  "title": "KOReader",
+  "intro": "Czytaj swoją bibliotekę książek na Kobo, Kindle lub innym czytniku z KOReaderem: przeglądaj i pobieraj książki z poziomu urządzenia i wracaj do miejsca, w którym skończyłeś, na czytniku lub w przeglądarce.",
+  "step1": "Pobierz wtyczkę i skopiuj folder <code>backissue.koplugin</code> z archiwum do folderu <code>plugins</code> KOReadera na urządzeniu, a następnie uruchom KOReadera ponownie.",
+  "step2": "W KOReaderze otwórz górne menu, a potem <b>Narzędzia</b> → <b>BackIssue</b>. Adres serwera jest już wpisany; wklej osobisty klucz utworzony w sekcji <b>Klucz API</b> na tej stronie.",
+  "step3": "Użyj <b>Przeglądaj bibliotekę</b>, aby pobierać książki. Postęp synchronizuje się przy otwieraniu i zamykaniu książki; <b>automatyczną synchronizację</b> można tam wyłączyć.",
+  "download": "Pobierz wtyczkę KOReader",
+  "_shared": {
+    "plugins": {
+      "koreader": {
+        "description": "Towarzysz KOReadera: przeglądaj i pobieraj bibliotekę książek na czytniku i utrzymuj zsynchronizowany postęp czytania, dokładny między urządzeniami z KOReaderem i procentowy z czytnikiem w przeglądarce"
+      }
+    },
+    "permissions": {
+      "koreader": {
+        "use": {
+          "label": "KOReader",
+          "description": "Przeglądanie i pobieranie książek z KOReadera oraz synchronizacja postępu czytania"
+        }
+      }
+    },
+    "jobs": {
+      "koreader-fingerprints": {
+        "label": "Oblicz odciski plików książek dla KOReadera"
+      }
+    }
+  }
+}

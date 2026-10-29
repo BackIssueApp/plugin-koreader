@@ -1,0 +1,28 @@
+{
+  "title": "KOReader",
+  "intro": "Lisez votre bibliothèque de livres sur une Kobo, une Kindle ou une autre liseuse équipée de KOReader : parcourez et téléchargez les livres depuis l’appareil, et reprenez là où vous en étiez, sur la liseuse comme dans le navigateur.",
+  "step1": "Téléchargez le plugin et copiez le dossier <code>backissue.koplugin</code> de l’archive dans le dossier <code>plugins</code> de KOReader sur l’appareil, puis redémarrez KOReader.",
+  "step2": "Dans KOReader, ouvrez le menu du haut, puis <b>Outils</b> → <b>BackIssue</b>. L’adresse du serveur est déjà renseignée ; collez une clé personnelle créée sous <b>Clé API</b> sur cette page.",
+  "step3": "Utilisez <b>Parcourir la bibliothèque</b> pour télécharger des livres. La progression se synchronise à l’ouverture et à la fermeture d’un livre ; la <b>synchronisation automatique</b> peut y être désactivée.",
+  "download": "Télécharger le plugin KOReader",
+  "_shared": {
+    "plugins": {
+      "koreader": {
+        "description": "Compagnon KOReader : parcourez et téléchargez votre bibliothèque de livres sur une liseuse et gardez la progression de lecture synchronisée, à la position exacte entre appareils KOReader et au pourcentage avec le lecteur web"
+      }
+    },
+    "permissions": {
+      "koreader": {
+        "use": {
+          "label": "KOReader",
+          "description": "Parcourir et télécharger des livres depuis KOReader et synchroniser la progression de lecture"
+        }
+      }
+    },
+    "jobs": {
+      "koreader-fingerprints": {
+        "label": "Calculer les empreintes des livres pour KOReader"
+      }
+    }
+  }
+}

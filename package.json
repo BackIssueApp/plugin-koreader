@@ -1,0 +1,11 @@
+{
+  "name": "koreader",
+  "version": "0.1.0",
+  "description": "KOReader companion: browse and download your Books library on an e-reader and keep reading progress in sync with BackIssue, exact between KOReader devices and by percentage with the web reader",
+  "type": "module",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}

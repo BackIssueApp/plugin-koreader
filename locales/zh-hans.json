@@ -1,0 +1,28 @@
+{
+  "title": "KOReader",
+  "intro": "在运行 KOReader 的 Kobo、Kindle 或其他电子书阅读器上阅读你的图书库：直接在设备上浏览和下载图书，并在设备或浏览器中从上次离开的位置继续阅读。",
+  "step1": "下载插件，将压缩包中的 <code>backissue.koplugin</code> 文件夹复制到设备上 KOReader 的 <code>plugins</code> 文件夹中，然后重新启动 KOReader。",
+  "step2": "在 KOReader 中打开顶部菜单，然后选择<b>工具</b> → <b>BackIssue</b>。服务器地址已经填好；粘贴在本页<b>API 密钥</b>中创建的个人密钥。",
+  "step3": "使用<b>浏览图书库</b>下载图书。打开和关闭图书时会同步阅读进度；可以在那里关闭<b>自动同步</b>。",
+  "download": "下载 KOReader 插件",
+  "_shared": {
+    "plugins": {
+      "koreader": {
+        "description": "KOReader 伴侣：在电子书阅读器上浏览和下载图书库，并保持阅读进度同步——KOReader 设备之间精确到位置，与网页阅读器按百分比同步"
+      }
+    },
+    "permissions": {
+      "koreader": {
+        "use": {
+          "label": "KOReader",
+          "description": "从 KOReader 浏览和下载图书，并同步阅读进度"
+        }
+      }
+    },
+    "jobs": {
+      "koreader-fingerprints": {
+        "label": "为 KOReader 计算图书文件指纹"
+      }
+    }
+  }
+}

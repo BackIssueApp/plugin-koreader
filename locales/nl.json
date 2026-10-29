@@ -1,0 +1,28 @@
+{
+  "title": "KOReader",
+  "intro": "Lees je boekenbibliotheek op een Kobo, Kindle of andere e-reader met KOReader: blader en download boeken op het apparaat zelf en ga verder waar je gebleven was, op de e-reader of in de browser.",
+  "step1": "Download de plugin en kopieer de map <code>backissue.koplugin</code> uit het zipbestand naar de map <code>plugins</code> van KOReader op het apparaat. Start KOReader daarna opnieuw.",
+  "step2": "Open in KOReader het bovenste menu en dan <b>Gereedschap</b> → <b>BackIssue</b>. Het serveradres is al ingevuld; plak een persoonlijke sleutel van <b>API-sleutel</b> op deze pagina.",
+  "step3": "Gebruik <b>Bibliotheek bladeren</b> om boeken te downloaden. De voortgang wordt gesynchroniseerd bij het openen en sluiten van een boek; <b>Automatisch synchroniseren</b> kun je daar uitzetten.",
+  "download": "KOReader-plugin downloaden",
+  "_shared": {
+    "plugins": {
+      "koreader": {
+        "description": "KOReader-metgezel: blader en download je boekenbibliotheek op een e-reader en houd de leesvoortgang gelijk, exact tussen KOReader-apparaten en op percentage met de webreader"
+      }
+    },
+    "permissions": {
+      "koreader": {
+        "use": {
+          "label": "KOReader",
+          "description": "Boeken bladeren en downloaden vanuit KOReader en de leesvoortgang ermee synchroniseren"
+        }
+      }
+    },
+    "jobs": {
+      "koreader-fingerprints": {
+        "label": "Vingerafdrukken van boekbestanden berekenen voor KOReader"
+      }
+    }
+  }
+}

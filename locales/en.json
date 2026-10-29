@@ -1,0 +1,28 @@
+{
+  "title": "KOReader",
+  "intro": "Read your Books library on a Kobo, Kindle or other e-reader running KOReader: browse and download books from the device, and pick up where you left off, on the device or in the browser.",
+  "step1": "Download the plugin and copy the <code>backissue.koplugin</code> folder from the zip into KOReader's <code>plugins</code> folder on the device, then restart KOReader.",
+  "step2": "In KOReader open the top menu, then <b>Tools</b> → <b>BackIssue</b>. The server address is already filled in; paste a personal key from <b>API key</b> on this page.",
+  "step3": "Use <b>Browse library</b> to download books. Progress syncs when you open and close a book; <b>Automatic sync</b> can be switched off there.",
+  "download": "Download the KOReader plugin",
+  "_shared": {
+    "plugins": {
+      "koreader": {
+        "description": "KOReader companion: browse and download your Books library on an e-reader and keep reading progress in sync, exact between KOReader devices and by percentage with the web reader"
+      }
+    },
+    "permissions": {
+      "koreader": {
+        "use": {
+          "label": "KOReader",
+          "description": "Browse and download books from KOReader and sync reading progress with it"
+        }
+      }
+    },
+    "jobs": {
+      "koreader-fingerprints": {
+        "label": "Fingerprint book files for KOReader"
+      }
+    }
+  }
+}
