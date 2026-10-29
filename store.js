@@ -119,6 +119,7 @@ export function openKoreaderStore(dbPath, { fingerprintFile } = {}) {
     series_id: isStandalone(r.series_url) ? null : (r.series_id ?? null),
     description: r.description ? String(r.description).slice(0, 4000) : null,
     download: `/api/ebooks/issue/${r.issue_id}/file?dl=1`,
+    cover: `/api/ebooks/issue/${r.issue_id}/cover`,
   });
 
   const BOOK_FROM = (userId) => `
@@ -161,7 +162,7 @@ export function openKoreaderStore(dbPath, { fingerprintFile } = {}) {
     hasEbooks,
 
     /** One page of the Books library, as a device lists it. */
-    listBooks({ userId = 0, q = '', offset = 0, limit = 100, sort = 'title', author = '', seriesId = null, includeRestricted = true } = {}) {
+    listBooks({ userId = 0, q = '', offset = 0, limit = 100, sort = 'title', author = '', seriesId = null, finished = false, includeRestricted = true } = {}) {
       if (!hasEbooks()) return { total: 0, books: [] };
       const conds = [];
       const params = [];
@@ -184,6 +185,7 @@ export function openKoreaderStore(dbPath, { fingerprintFile } = {}) {
       if (seriesId != null && seriesId !== '') { conds.push('s.id = ?'); params.push(Number(seriesId)); }
       // "progress": books under way, most recently read first.
       if (sort === 'progress') conds.push(`p.fraction > 0 AND p.fraction < ${FINISHED}`);
+      if (finished) conds.push(`p.fraction >= ${FINISHED}`);
       const whereSql = conds.length ? ' AND ' + conds.join(' AND ') : '';
       const order = sort === 'recent' ? 'ORDER BY ef.added_at DESC, ef.rowid DESC'
         : sort === 'progress' ? 'ORDER BY p.updated_at DESC, ef.rowid DESC'

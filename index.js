@@ -135,7 +135,7 @@ export default async function register(api) {
     res.json(store.listBooks({
       userId: uid(req), q: req.query.q, offset: req.query.offset, limit: req.query.limit,
       sort: ['recent', 'progress'].includes(req.query.sort) ? req.query.sort : 'title',
-      author: req.query.author, seriesId: req.query.series, includeRestricted: canRestricted(req),
+      author: req.query.author, seriesId: req.query.series, finished: req.query.finished === '1', includeRestricted: canRestricted(req),
     }));
   }, OPTS);
 

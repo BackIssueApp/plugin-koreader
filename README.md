@@ -5,9 +5,14 @@ in step with it. The plugin has two halves: a BackIssue plugin that adds a
 small API and a card on your Profile page, and a KOReader plugin for the
 device, downloaded from that card with your server's address already inside.
 
-On the device, **Tools → BackIssue** browses the Books library, downloads a
-book to a folder of your choice and opens it. While you read, the plugin
-keeps BackIssue up to date, and brings back what changed elsewhere:
+On the device, **Tools → BackIssue → Dashboard** opens a cover-led view of
+the library: a row of books under way, a row of the newest, and buttons for
+all books, authors, series, what is on this device and what is finished.
+Every list is a grid of covers with paging; a tap opens the book's page, with
+cover, author, series, format, progress and description, and buttons to read
+or download it and to mark it finished. A long press on a cover downloads at
+once. While you read, the plugin keeps BackIssue up to date, and brings back
+what changed elsewhere:
 
 - **Positions.** Between KOReader devices the position is exact (the same
   paragraph in an EPUB, the same page in a PDF); with the web reader and the
@@ -51,10 +56,12 @@ restart of KOReader finishes it.
 
 ## Use
 
-- **Browse library**, **Continue reading**, **Recently added**, **Authors**,
-  **Series** and **Search library** list the books; tap one to download it
-  (and open it straight away if you like), hold one for its details and
-  description. Books already on the device say so.
+- **Dashboard** is the cover view described above. **Browse library**,
+  **Continue reading**, **Recently added**, **Authors**, **Series** and
+  **Search library** open the same cover grids directly; tap a cover for the
+  book's page, hold it to download at once. Covers are fetched once and kept
+  in KOReader's cache folder, scaled to the screen. Books already on the
+  device say so.
 - **Pull progress from server**, **Push progress to server** and **Sync
   highlights of this book** sync the open book by hand.
 - **Sync all books** sweeps the reading history: every book the server knows

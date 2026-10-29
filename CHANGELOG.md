@@ -31,8 +31,13 @@ by the maintainers when changes merge, so concurrent PRs don't conflict here.
   card shows reading time by book, grouped into sittings.
 - **Sync all books** sweeps the reading history so books read before the
   plugin was installed are synced, with the server keeping any newer position.
-- Browse by **Continue reading**, **Authors** and **Series**; a book's details
-  show its description.
+- A **Dashboard** on the device: rows of covers for books under way and the
+  newest, and buttons for all books, authors, series, on this device and
+  finished. Every list is a cover grid with paging; a tap opens a book page
+  with cover, metadata, progress and description, and Read / Download / Mark
+  finished buttons. Covers are scaled once and cached on the device.
+- Browse by **Continue reading**, **Authors** and **Series**; a book's page
+  shows its description.
 - **Check for plugin update** installs the server's newer copy of the device
   plugin in place.
 - The Profile card lists the devices that have synced (plugin version, last
