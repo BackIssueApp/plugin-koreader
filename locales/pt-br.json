@@ -1,14 +1,31 @@
 {
   "title": "KOReader",
-  "intro": "Leia sua biblioteca de livros em um Kobo, Kindle ou outro leitor com KOReader: navegue e baixe livros pelo próprio aparelho e continue de onde parou, no leitor ou no navegador.",
+  "intro": "Leia sua biblioteca de Livros em um Kobo, Kindle ou outro e-reader com KOReader: navegue e baixe livros pelo dispositivo, e mantenha a posição, o status de concluído, os destaques e o tempo de leitura sincronizados com o navegador e os apps.",
   "step1": "Baixe o plugin e copie a pasta <code>backissue.koplugin</code> do zip para a pasta <code>plugins</code> do KOReader no aparelho; depois reinicie o KOReader.",
   "step2": "No KOReader abra o menu superior e depois <b>Ferramentas</b> → <b>BackIssue</b>. O endereço do servidor já vem preenchido; cole uma chave pessoal criada em <b>Chave de API</b> nesta página.",
-  "step3": "Use <b>Navegar na biblioteca</b> para baixar livros. O progresso sincroniza ao abrir e fechar um livro; a <b>sincronização automática</b> pode ser desligada ali.",
+  "step3": "Use <b>Navegar na biblioteca</b> para baixar livros. Posições, destaques e estatísticas de leitura sincronizam ao abrir e fechar livros; <b>Sincronizar todos os livros</b> recupera os antigos, e cada tipo de sincronização pode ser desligado ali.",
   "download": "Baixar o plugin do KOReader",
+  "devices": "Dispositivos",
+  "noDevices": "Nenhum dispositivo se conectou ainda.",
+  "lastSeen": "Visto pela última vez {when}",
+  "lastBook": "Última leitura: {title}",
+  "pluginVersion": "Plugin {version}",
+  "upToDate": "atualizado",
+  "updateAvailable": "{version} disponível, use “Verificar atualização do plugin” no dispositivo",
+  "counts": "{books} livros · {highlights} destaques · {events} eventos de leitura",
+  "forget": "Esquecer",
+  "forgetFailed": "Não foi possível esquecer este dispositivo.",
+  "readingTime": "Tempo de leitura no KOReader",
+  "noReading": "Ainda sem tempo de leitura. Ele chega depois que um livro é fechado no dispositivo.",
+  "recentLine": "{time} em {sessions} sessões nos últimos {days} dias",
+  "totalLine": "{time} em {sessions} sessões no total",
+  "hoursMinutes": "{h} h {m} min",
+  "minutes": "{m} min",
+  "loadFailed": "Não foi possível carregar os dados do KOReader.",
   "_shared": {
     "plugins": {
       "koreader": {
-        "description": "Companheiro do KOReader: navegue e baixe sua biblioteca de livros em um leitor e mantenha o progresso de leitura sincronizado, exato entre aparelhos KOReader e por porcentagem com o leitor web"
+        "description": "Companheiro KOReader: navegue e baixe sua biblioteca de Livros em um e-reader, e mantenha posições, status de concluído, destaques e tempo de leitura sincronizados com o leitor web e os apps"
       }
     },
     "permissions": {

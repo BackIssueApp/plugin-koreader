@@ -1,14 +1,31 @@
 {
   "title": "KOReader",
-  "intro": "Lisez votre bibliothèque de livres sur une Kobo, une Kindle ou une autre liseuse équipée de KOReader : parcourez et téléchargez les livres depuis l’appareil, et reprenez là où vous en étiez, sur la liseuse comme dans le navigateur.",
+  "intro": "Lisez votre bibliothèque Livres sur une Kobo, une Kindle ou une autre liseuse sous KOReader : parcourez et téléchargez les livres depuis l’appareil, et gardez votre position, l’état « terminé », vos surlignages et votre temps de lecture synchronisés avec le navigateur et les applications.",
   "step1": "Téléchargez le plugin et copiez le dossier <code>backissue.koplugin</code> de l’archive dans le dossier <code>plugins</code> de KOReader sur l’appareil, puis redémarrez KOReader.",
   "step2": "Dans KOReader, ouvrez le menu du haut, puis <b>Outils</b> → <b>BackIssue</b>. L’adresse du serveur est déjà renseignée ; collez une clé personnelle créée sous <b>Clé API</b> sur cette page.",
-  "step3": "Utilisez <b>Parcourir la bibliothèque</b> pour télécharger des livres. La progression se synchronise à l’ouverture et à la fermeture d’un livre ; la <b>synchronisation automatique</b> peut y être désactivée.",
+  "step3": "Utilisez <b>Parcourir la bibliothèque</b> pour télécharger des livres. Positions, surlignages et statistiques de lecture se synchronisent à l’ouverture et à la fermeture des livres ; <b>Synchroniser tous les livres</b> rattrape les anciens, et chaque type de synchronisation peut y être désactivé.",
   "download": "Télécharger le plugin KOReader",
+  "devices": "Appareils",
+  "noDevices": "Aucun appareil ne s’est encore connecté.",
+  "lastSeen": "Vu pour la dernière fois {when}",
+  "lastBook": "Dernière lecture : {title}",
+  "pluginVersion": "Extension {version}",
+  "upToDate": "à jour",
+  "updateAvailable": "{version} disponible, utilisez « Vérifier les mises à jour de l’extension » sur l’appareil",
+  "counts": "{books} livres · {highlights} surlignages · {events} événements de lecture",
+  "forget": "Oublier",
+  "forgetFailed": "Impossible d’oublier cet appareil.",
+  "readingTime": "Temps de lecture sur KOReader",
+  "noReading": "Pas encore de temps de lecture. Il arrive après la fermeture d’un livre sur l’appareil.",
+  "recentLine": "{time} en {sessions} sessions ces {days} derniers jours",
+  "totalLine": "{time} en {sessions} sessions au total",
+  "hoursMinutes": "{h} h {m} min",
+  "minutes": "{m} min",
+  "loadFailed": "Impossible de charger les informations KOReader.",
   "_shared": {
     "plugins": {
       "koreader": {
-        "description": "Compagnon KOReader : parcourez et téléchargez votre bibliothèque de livres sur une liseuse et gardez la progression de lecture synchronisée, à la position exacte entre appareils KOReader et au pourcentage avec le lecteur web"
+        "description": "Compagnon KOReader : parcourez et téléchargez votre bibliothèque Livres sur une liseuse, et gardez positions, état « terminé », surlignages et temps de lecture synchronisés avec le lecteur web et les applications"
       }
     },
     "permissions": {

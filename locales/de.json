@@ -1,14 +1,31 @@
 {
   "title": "KOReader",
-  "intro": "Lesen Sie Ihre Bücherbibliothek auf einem Kobo, Kindle oder einem anderen E-Reader mit KOReader: Bücher direkt auf dem Gerät durchsuchen und herunterladen und dort weiterlesen, wo Sie aufgehört haben, auf dem Gerät wie im Browser.",
+  "intro": "Lesen Sie Ihre Bücher-Bibliothek auf einem Kobo, Kindle oder einem anderen E-Reader mit KOReader: Bücher vom Gerät aus durchsuchen und herunterladen, und Leseposition, Gelesen-Status, Markierungen und Lesezeit mit dem Browser und den Apps abgleichen.",
   "step1": "Laden Sie das Plugin herunter und kopieren Sie den Ordner <code>backissue.koplugin</code> aus dem Zip in den Ordner <code>plugins</code> von KOReader auf dem Gerät. Starten Sie KOReader danach neu.",
   "step2": "Öffnen Sie in KOReader das obere Menü, dann <b>Werkzeuge</b> → <b>BackIssue</b>. Die Serveradresse ist bereits eingetragen; fügen Sie einen persönlichen Schlüssel aus <b>API-Schlüssel</b> auf dieser Seite ein.",
-  "step3": "Mit <b>Bibliothek durchsuchen</b> laden Sie Bücher herunter. Der Lesefortschritt wird beim Öffnen und Schließen eines Buches abgeglichen; die <b>automatische Synchronisierung</b> lässt sich dort abschalten.",
+  "step3": "Mit <b>Bibliothek durchsuchen</b> laden Sie Bücher herunter. Positionen, Markierungen und Lesestatistiken werden beim Öffnen und Schließen abgeglichen; <b>Alle Bücher synchronisieren</b> holt ältere nach, und jede Art von Abgleich lässt sich dort abschalten.",
   "download": "KOReader-Plugin herunterladen",
+  "devices": "Geräte",
+  "noDevices": "Bisher hat sich kein Gerät verbunden.",
+  "lastSeen": "Zuletzt gesehen {when}",
+  "lastBook": "Zuletzt gelesen: {title}",
+  "pluginVersion": "Plugin {version}",
+  "upToDate": "aktuell",
+  "updateAvailable": "{version} verfügbar, auf dem Gerät „Nach Plugin-Update suchen“ wählen",
+  "counts": "{books} Bücher · {highlights} Markierungen · {events} Leseereignisse",
+  "forget": "Vergessen",
+  "forgetFailed": "Dieses Gerät konnte nicht vergessen werden.",
+  "readingTime": "Lesezeit auf KOReader",
+  "noReading": "Noch keine Lesezeit. Sie kommt an, sobald ein Buch auf dem Gerät geschlossen wird.",
+  "recentLine": "{time} in {sessions} Sitzungen in den letzten {days} Tagen",
+  "totalLine": "{time} in {sessions} Sitzungen insgesamt",
+  "hoursMinutes": "{h} Std. {m} Min.",
+  "minutes": "{m} Min.",
+  "loadFailed": "KOReader-Angaben konnten nicht geladen werden.",
   "_shared": {
     "plugins": {
       "koreader": {
-        "description": "KOReader-Begleiter: Bücherbibliothek auf einem E-Reader durchsuchen und herunterladen und den Lesefortschritt synchron halten, positionsgenau zwischen KOReader-Geräten und prozentual mit dem Web-Reader"
+        "description": "KOReader-Begleiter: Bücher-Bibliothek auf einem E-Reader durchsuchen und herunterladen; Positionen, Gelesen-Status, Markierungen und Lesezeit mit dem Web-Reader und den Apps abgleichen"
       }
     },
     "permissions": {

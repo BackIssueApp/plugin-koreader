@@ -34,6 +34,26 @@ end
 local Api = {}
 Api.__index = Api
 
+function Api.encode(v) return JSON.encode(v) end
+
+-- An empty Lua table encodes as a JSON object; mark lists so they come out
+-- as arrays (rapidjson honours __jsontype; the fallback encoder guesses).
+local function asArray(t)
+    t = t or {}
+    if json_ok then setmetatable(t, { __jsontype = "array" }) end
+    return t
+end
+function Api.decode(s)
+    local ok, v = pcall(JSON.decode, s)
+    if ok then return withoutNulls(v) end
+    return nil
+end
+
+local function urlencode(s)
+    return (tostring(s):gsub("[^%w%-%._~]", function(c) return string.format("%%%02X", string.byte(c)) end))
+end
+
+--- o: server, api_key, user_agent, plugin_version, device_id, device_name, model.
 function Api:new(o)
     o = o or {}
     setmetatable(o, self)
@@ -52,10 +72,6 @@ local function requester(u)
     return require("socket.http")
 end
 
-local function urlencode(s)
-    return (tostring(s):gsub("[^%w%-%._~]", function(c) return string.format("%%%02X", string.byte(c)) end))
-end
-
 local function query(params)
     local parts = {}
     for k, v in pairs(params or {}) do
@@ -65,6 +81,8 @@ local function query(params)
     return #parts > 0 and ("?" .. table.concat(parts, "&")) or ""
 end
 
+-- Every call names the device, so the server's Devices list stays current
+-- without a call of its own.
 function Api:headers(extra)
     local h = {
         ["X-Api-Key"] = self.api_key,
@@ -72,6 +90,10 @@ function Api:headers(extra)
         ["User-Agent"] = self.user_agent,
         ["Accept-Encoding"] = "identity",
     }
+    if self.device_id then h["X-Device-Id"] = tostring(self.device_id) end
+    if self.device_name then h["X-Device-Name"] = urlencode(self.device_name) end
+    if self.model then h["X-Device-Model"] = urlencode(self.model) end
+    if self.plugin_version then h["X-Plugin-Version"] = tostring(self.plugin_version) end
     for k, v in pairs(extra or {}) do h[k] = v end
     return h
 end
@@ -105,10 +127,7 @@ function Api:request(method, path, body)
     end
     local text = table.concat(chunks)
     local decoded
-    if text ~= "" then
-        local dok, d = pcall(JSON.decode, text)
-        if dok then decoded = withoutNulls(d) end
-    end
+    if text ~= "" then decoded = Api.decode(text) end
     if type(code) ~= "number" or code < 200 or code >= 300 then
         logger.warn("BackIssue: HTTP", code, method, u)
         return nil, describe(code, status, decoded), code
@@ -148,9 +167,21 @@ function Api:me()
 end
 
 --- { total, books = { { id, title, authors, series, series_index, format,
--- size, library, remote, filename, fraction, download } } }
+-- size, library, remote, filename, fraction, finished, description,
+-- download } } }. params: q, sort (title|recent|progress), author, series,
+-- offset, limit.
 function Api:books(params)
     return self:request("GET", "/api/koreader/books" .. query(params))
+end
+
+--- { authors = { { name, books } } }
+function Api:authors()
+    return self:request("GET", "/api/koreader/authors")
+end
+
+--- { series = { { id, title, authors, books } } }
+function Api:series()
+    return self:request("GET", "/api/koreader/series")
 end
 
 function Api:book(id)
@@ -164,18 +195,53 @@ function Api:lookup(fp, size)
 end
 
 --- The newest position: { fraction, position, kind, device, device_id,
--- source = "koreader" | "web", updated_at }, or nil when never opened.
+-- source = "koreader" | "web", status, finished, updated_at,
+-- file_changed_at }, or nil when never opened.
 function Api:getProgress(id)
     local r, err, code = self:request("GET", "/api/koreader/progress/" .. tostring(id))
     if not r then return nil, err, code end
     return { progress = type(r.progress) == "table" and r.progress or nil }, nil, code
 end
 
+--- p: fraction, position, kind, status, at (unix seconds of the device's
+-- last access, for a sweep). The answer's progress.skipped says the server
+-- already had something newer.
 function Api:putProgress(id, p)
     return self:request("PUT", "/api/koreader/progress/" .. tostring(id), {
         fraction = p.fraction, position = p.position, kind = p.kind,
-        device = p.device, device_id = p.device_id,
+        device = p.device, device_id = p.device_id, status = p.status, at = p.at,
     })
+end
+
+--- { items = { { key, kind, pos0, pos1, page, chapter, text, note, color,
+-- drawer, fraction, device, created_at, updated_at } }, deleted = { key } }
+function Api:getHighlights(id)
+    return self:request("GET", "/api/koreader/highlights/" .. tostring(id))
+end
+
+--- items: the device's full list after merging; deleted: keys it removed.
+-- Answers like getHighlights.
+function Api:putHighlights(id, items, deleted, device)
+    return self:request("PUT", "/api/koreader/highlights/" .. tostring(id), {
+        items = asArray(items), deleted = asArray(deleted), device = device.device, device_id = device.device_id,
+    })
+end
+
+--- The newest page event this device already sent for a book (unix seconds).
+function Api:eventsCursor(id)
+    local r, err, code = self:request("GET", "/api/koreader/events/" .. tostring(id) .. "/cursor")
+    if not r then return nil, err, code end
+    return tonumber(r.since) or 0
+end
+
+--- events: { { start_time, duration, page, pages } }. Answers { added }.
+function Api:putEvents(id, events)
+    return self:request("PUT", "/api/koreader/events/" .. tostring(id), { events = asArray(events) })
+end
+
+--- A "sync all" sweep finished.
+function Api:synced()
+    return self:request("POST", "/api/koreader/synced", {})
 end
 
 return Api

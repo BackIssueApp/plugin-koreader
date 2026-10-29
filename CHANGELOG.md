@@ -20,3 +20,21 @@ by the maintainers when changes merge, so concurrent PRs don't conflict here.
 - A fault inside the device plugin is shown as a message and written to
   `backissue_crash.log` in KOReader's data folder, instead of taking KOReader
   down with it.
+- **Highlights and notes** sync both ways: marks made on the device appear in
+  the web reader's bookmarks drawer and the apps' Highlights page with their
+  passage, colour and note; a note changed there follows back, a mark deleted
+  there is removed, and marks from another KOReader device land at their
+  exact spot in EPUBs.
+- **Reading status**: complete on the device is finished in BackIssue and the
+  other way round.
+- **Reading time**: KOReader's page statistics are uploaded, and the Profile
+  card shows reading time by book, grouped into sittings.
+- **Sync all books** sweeps the reading history so books read before the
+  plugin was installed are synced, with the server keeping any newer position.
+- Browse by **Continue reading**, **Authors** and **Series**; a book's details
+  show its description.
+- **Check for plugin update** installs the server's newer copy of the device
+  plugin in place.
+- The Profile card lists the devices that have synced (plugin version, last
+  seen, last book) with a Forget button, and the device is told when the
+  server's copy of a book changed under its position.

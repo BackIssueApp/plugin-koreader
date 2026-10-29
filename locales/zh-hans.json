@@ -1,14 +1,31 @@
 {
   "title": "KOReader",
-  "intro": "在运行 KOReader 的 Kobo、Kindle 或其他电子书阅读器上阅读你的图书库：直接在设备上浏览和下载图书，并在设备或浏览器中从上次离开的位置继续阅读。",
+  "intro": "在运行 KOReader 的 Kobo、Kindle 或其他电子书阅读器上阅读你的图书库：在设备上浏览并下载图书，并让阅读位置、已读完状态、高亮和阅读时长与浏览器和应用保持同步。",
   "step1": "下载插件，将压缩包中的 <code>backissue.koplugin</code> 文件夹复制到设备上 KOReader 的 <code>plugins</code> 文件夹中，然后重新启动 KOReader。",
   "step2": "在 KOReader 中打开顶部菜单，然后选择<b>工具</b> → <b>BackIssue</b>。服务器地址已经填好；粘贴在本页<b>API 密钥</b>中创建的个人密钥。",
-  "step3": "使用<b>浏览图书库</b>下载图书。打开和关闭图书时会同步阅读进度；可以在那里关闭<b>自动同步</b>。",
+  "step3": "使用<b>浏览图书库</b>下载图书。打开和关闭图书时会同步位置、高亮和阅读统计；<b>同步所有图书</b>可补齐之前的图书，每类同步都可以在那里关闭。",
   "download": "下载 KOReader 插件",
+  "devices": "设备",
+  "noDevices": "还没有设备连接过。",
+  "lastSeen": "最近连接 {when}",
+  "lastBook": "最近阅读：{title}",
+  "pluginVersion": "插件 {version}",
+  "upToDate": "已是最新",
+  "updateAvailable": "{version} 可用，请在设备上使用“检查插件更新”",
+  "counts": "{books} 本书 · {highlights} 条高亮 · {events} 条阅读记录",
+  "forget": "移除",
+  "forgetFailed": "无法移除此设备。",
+  "readingTime": "KOReader 上的阅读时长",
+  "noReading": "还没有阅读时长。在设备上关闭图书后就会同步过来。",
+  "recentLine": "最近 {days} 天共 {sessions} 次，{time}",
+  "totalLine": "累计 {sessions} 次，{time}",
+  "hoursMinutes": "{h} 小时 {m} 分钟",
+  "minutes": "{m} 分钟",
+  "loadFailed": "无法加载 KOReader 信息。",
   "_shared": {
     "plugins": {
       "koreader": {
-        "description": "KOReader 伴侣：在电子书阅读器上浏览和下载图书库，并保持阅读进度同步——KOReader 设备之间精确到位置，与网页阅读器按百分比同步"
+        "description": "KOReader 伴侣：在电子书阅读器上浏览并下载图书库，并让阅读位置、已读完状态、高亮和阅读时长与网页阅读器和应用保持同步"
       }
     },
     "permissions": {

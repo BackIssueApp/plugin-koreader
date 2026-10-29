@@ -98,8 +98,27 @@ export default async function register(api) {
     return host ? `${proto}://${host}` : '';
   };
 
+  // Every call from the device names it in headers; that keeps the Devices
+  // list on the Profile page current without a call of its own.
+  const seen = (req, extra = {}) => {
+    const id = req.headers['x-device-id'];
+    if (!id) return;
+    store.touchDevice(uid(req), {
+      device_id: String(id), name: req.headers['x-device-name'] ? decodeURIComponent(String(req.headers['x-device-name'])) : null,
+      model: req.headers['x-device-model'] ? String(req.headers['x-device-model']) : null,
+      plugin_version: req.headers['x-plugin-version'] ? String(req.headers['x-plugin-version']) : null, ...extra,
+    });
+  };
+  // A list from the device: an empty Lua table arrives as {} rather than [].
+  const listOf = (v) => (Array.isArray(v) ? v : v && typeof v === 'object' ? Object.values(v) : null);
+  const deviceOf = (req, body = {}) => ({
+    device: body.device || (req.headers['x-device-name'] ? decodeURIComponent(String(req.headers['x-device-name'])) : null),
+    device_id: body.device_id || (req.headers['x-device-id'] ? String(req.headers['x-device-id']) : null),
+  });
+
   // GET /api/koreader/me — who am I, and is the server ready for the device.
   api.registerRoute('get', '/api/koreader/me', (req, res) => {
+    seen(req);
     res.json({
       ok: true,
       user: req.user?.username || null,
@@ -110,12 +129,22 @@ export default async function register(api) {
     });
   }, OPTS);
 
-  // GET /api/koreader/books?q=&offset=&limit=&sort=title|recent
+  // GET /api/koreader/books?q=&offset=&limit=&sort=title|recent|progress&author=&series=
   api.registerRoute('get', '/api/koreader/books', (req, res) => {
+    seen(req);
     res.json(store.listBooks({
       userId: uid(req), q: req.query.q, offset: req.query.offset, limit: req.query.limit,
-      sort: req.query.sort === 'recent' ? 'recent' : 'title', includeRestricted: canRestricted(req),
+      sort: ['recent', 'progress'].includes(req.query.sort) ? req.query.sort : 'title',
+      author: req.query.author, seriesId: req.query.series, includeRestricted: canRestricted(req),
     }));
+  }, OPTS);
+
+  // GET /api/koreader/authors, GET /api/koreader/series — the browse views.
+  api.registerRoute('get', '/api/koreader/authors', (req, res) => {
+    res.json({ authors: store.authors({ includeRestricted: canRestricted(req) }) });
+  }, OPTS);
+  api.registerRoute('get', '/api/koreader/series', (req, res) => {
+    res.json({ series: store.seriesList({ includeRestricted: canRestricted(req) }) });
   }, OPTS);
 
   // GET /api/koreader/books/:id — one book, with its download path.
@@ -143,14 +172,77 @@ export default async function register(api) {
     res.json({ progress: p });
   }, OPTS);
 
-  // PUT /api/koreader/progress/:id { fraction, position, kind, device, device_id }
+  // PUT /api/koreader/progress/:id { fraction, position, kind, device, device_id, status, at }
   api.registerRoute('put', '/api/koreader/progress/:id', (req, res) => {
     const b = store.book(req.params.id, { userId: uid(req), includeRestricted: canRestricted(req) });
     if (!b) return res.status(404).json({ error: 'not a book' });
     const body = req.body || {};
     if (!Number.isFinite(Number(body.fraction))) return res.status(400).json({ error: 'fraction (0..1) is required' });
-    res.json({ ok: true, progress: store.saveProgress(uid(req), b.id, body, { ebooks }) });
+    seen(req);
+    res.json({ ok: true, progress: store.saveProgress(uid(req), b.id, { ...body, ...deviceOf(req, body) }, { ebooks }) });
   }, WRITE);
+
+  // GET /api/koreader/highlights/:id — KOReader's highlights for a book as
+  // the server holds them, with the keys deleted on the web since.
+  api.registerRoute('get', '/api/koreader/highlights/:id', (req, res) => {
+    const b = store.book(req.params.id, { userId: uid(req), includeRestricted: canRestricted(req) });
+    if (!b) return res.status(404).json({ error: 'not a book' });
+    seen(req);
+    res.json(store.highlights(uid(req), b.id));
+  }, OPTS);
+
+  // PUT /api/koreader/highlights/:id { items: [...], deleted: [key] } — the
+  // device's list after it merged the server's; answers with the result.
+  api.registerRoute('put', '/api/koreader/highlights/:id', (req, res) => {
+    const b = store.book(req.params.id, { userId: uid(req), includeRestricted: canRestricted(req) });
+    if (!b) return res.status(404).json({ error: 'not a book' });
+    const body = req.body || {};
+    const items = listOf(body.items);
+    if (!items) return res.status(400).json({ error: 'items (array) is required' });
+    seen(req);
+    res.json(store.syncHighlights(uid(req), b.id, {
+      items, deleted: listOf(body.deleted) || [], ...deviceOf(req, body),
+    }));
+  }, WRITE);
+
+  // GET /api/koreader/events/:id/cursor — the newest page event this device
+  // already sent for a book, so it uploads only what followed.
+  api.registerRoute('get', '/api/koreader/events/:id/cursor', (req, res) => {
+    const b = store.book(req.params.id, { userId: uid(req), includeRestricted: canRestricted(req) });
+    if (!b) return res.status(404).json({ error: 'not a book' });
+    res.json({ since: store.eventsCursor(uid(req), b.id, deviceOf(req).device_id) });
+  }, OPTS);
+
+  // PUT /api/koreader/events/:id { events: [{ start_time, duration, page, pages }] }
+  api.registerRoute('put', '/api/koreader/events/:id', (req, res) => {
+    const b = store.book(req.params.id, { userId: uid(req), includeRestricted: canRestricted(req) });
+    if (!b) return res.status(404).json({ error: 'not a book' });
+    const body = req.body || {};
+    const events = listOf(body.events);
+    if (!events) return res.status(400).json({ error: 'events (array) is required' });
+    seen(req);
+    const added = store.addEvents(uid(req), b.id, deviceOf(req, body).device_id || '', events.slice(0, 5000));
+    res.json({ ok: true, added });
+  }, WRITE);
+
+  // POST /api/koreader/synced — a device finished a "sync all" sweep.
+  api.registerRoute('post', '/api/koreader/synced', (req, res) => {
+    const d = deviceOf(req, req.body || {});
+    if (d.device_id) store.touchDevice(uid(req), { device_id: d.device_id, name: d.device, synced: true });
+    res.json({ ok: true });
+  }, WRITE);
+
+  // The Profile card: devices and reading time.
+  api.registerRoute('get', '/api/koreader/devices', (req, res) => {
+    res.json({ devices: store.devices(uid(req)) });
+  }, { access: CAN });
+  api.registerRoute('delete', '/api/koreader/devices/:id', (req, res) => {
+    res.json({ ok: true, removed: store.forgetDevice(uid(req), req.params.id) });
+  }, { access: CAN });
+  api.registerRoute('get', '/api/koreader/stats', (req, res) => {
+    res.json(store.readingStats(uid(req), { days: req.query.days, limit: req.query.limit }));
+  }, { access: CAN });
+  setInterval(() => { try { store.pruneHighlights(); } catch { /* next time */ } }, 6 * 3600 * 1000).unref?.();
 
   // GET /api/koreader/plugin.zip — the device plugin, with this server's
   // address written in. Downloaded from the Profile page.

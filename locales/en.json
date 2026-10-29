@@ -1,14 +1,31 @@
 {
   "title": "KOReader",
-  "intro": "Read your Books library on a Kobo, Kindle or other e-reader running KOReader: browse and download books from the device, and pick up where you left off, on the device or in the browser.",
+  "intro": "Read your Books library on a Kobo, Kindle or other e-reader running KOReader: browse and download books from the device, and keep your place, finished status, highlights and reading time in sync with the browser and the apps.",
   "step1": "Download the plugin and copy the <code>backissue.koplugin</code> folder from the zip into KOReader's <code>plugins</code> folder on the device, then restart KOReader.",
   "step2": "In KOReader open the top menu, then <b>Tools</b> → <b>BackIssue</b>. The server address is already filled in; paste a personal key from <b>API key</b> on this page.",
-  "step3": "Use <b>Browse library</b> to download books. Progress syncs when you open and close a book; <b>Automatic sync</b> can be switched off there.",
+  "step3": "Use <b>Browse library</b> to download books. Positions, highlights and reading statistics sync as you open and close books; <b>Sync all books</b> catches up older ones, and each kind of sync can be switched off there.",
   "download": "Download the KOReader plugin",
+  "devices": "Devices",
+  "noDevices": "No device has connected yet.",
+  "lastSeen": "Last seen {when}",
+  "lastBook": "Last read: {title}",
+  "pluginVersion": "Plugin {version}",
+  "upToDate": "up to date",
+  "updateAvailable": "{version} available, use Check for plugin update on the device",
+  "counts": "{books} books · {highlights} highlights · {events} reading events",
+  "forget": "Forget",
+  "forgetFailed": "Could not forget this device.",
+  "readingTime": "Reading time on KOReader",
+  "noReading": "No reading time yet. It arrives after a book is closed on the device.",
+  "recentLine": "{time} in {sessions} sittings in the last {days} days",
+  "totalLine": "{time} in {sessions} sittings, all time",
+  "hoursMinutes": "{h} h {m} min",
+  "minutes": "{m} min",
+  "loadFailed": "Could not load KOReader details.",
   "_shared": {
     "plugins": {
       "koreader": {
-        "description": "KOReader companion: browse and download your Books library on an e-reader and keep reading progress in sync, exact between KOReader devices and by percentage with the web reader"
+        "description": "KOReader companion: browse and download your Books library on an e-reader, and keep positions, finished status, highlights and reading time in sync with the web reader and the apps"
       }
     },
     "permissions": {

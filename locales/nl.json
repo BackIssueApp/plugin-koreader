@@ -1,14 +1,31 @@
 {
   "title": "KOReader",
-  "intro": "Lees je boekenbibliotheek op een Kobo, Kindle of andere e-reader met KOReader: blader en download boeken op het apparaat zelf en ga verder waar je gebleven was, op de e-reader of in de browser.",
+  "intro": "Lees je Boeken-bibliotheek op een Kobo, Kindle of andere e-reader met KOReader: blader en download boeken vanaf het apparaat, en houd je positie, de status „uitgelezen”, markeringen en leestijd gelijk met de browser en de apps.",
   "step1": "Download de plugin en kopieer de map <code>backissue.koplugin</code> uit het zipbestand naar de map <code>plugins</code> van KOReader op het apparaat. Start KOReader daarna opnieuw.",
   "step2": "Open in KOReader het bovenste menu en dan <b>Gereedschap</b> → <b>BackIssue</b>. Het serveradres is al ingevuld; plak een persoonlijke sleutel van <b>API-sleutel</b> op deze pagina.",
-  "step3": "Gebruik <b>Bibliotheek bladeren</b> om boeken te downloaden. De voortgang wordt gesynchroniseerd bij het openen en sluiten van een boek; <b>Automatisch synchroniseren</b> kun je daar uitzetten.",
+  "step3": "Gebruik <b>Bibliotheek bladeren</b> om boeken te downloaden. Posities, markeringen en leesstatistieken synchroniseren bij het openen en sluiten van boeken; <b>Alle boeken synchroniseren</b> haalt oudere in, en elke soort synchronisatie kan daar uit.",
   "download": "KOReader-plugin downloaden",
+  "devices": "Apparaten",
+  "noDevices": "Er heeft nog geen apparaat verbinding gemaakt.",
+  "lastSeen": "Laatst gezien {when}",
+  "lastBook": "Laatst gelezen: {title}",
+  "pluginVersion": "Plug-in {version}",
+  "upToDate": "actueel",
+  "updateAvailable": "{version} beschikbaar, kies „Controleren op plug-in-update” op het apparaat",
+  "counts": "{books} boeken · {highlights} markeringen · {events} leesgebeurtenissen",
+  "forget": "Vergeten",
+  "forgetFailed": "Kon dit apparaat niet vergeten.",
+  "readingTime": "Leestijd op KOReader",
+  "noReading": "Nog geen leestijd. Die komt binnen nadat een boek op het apparaat is gesloten.",
+  "recentLine": "{time} in {sessions} sessies in de laatste {days} dagen",
+  "totalLine": "{time} in {sessions} sessies in totaal",
+  "hoursMinutes": "{h} u {m} min",
+  "minutes": "{m} min",
+  "loadFailed": "Kon de KOReader-gegevens niet laden.",
   "_shared": {
     "plugins": {
       "koreader": {
-        "description": "KOReader-metgezel: blader en download je boekenbibliotheek op een e-reader en houd de leesvoortgang gelijk, exact tussen KOReader-apparaten en op percentage met de webreader"
+        "description": "KOReader-metgezel: blader en download je Boeken-bibliotheek op een e-reader, en houd posities, status „uitgelezen”, markeringen en leestijd gelijk met de weblezer en de apps"
       }
     },
     "permissions": {

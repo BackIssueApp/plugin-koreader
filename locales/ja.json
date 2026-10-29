@@ -1,14 +1,31 @@
 {
   "title": "KOReader",
-  "intro": "KOReader を搭載した Kobo、Kindle などの電子書籍リーダーで本のライブラリを読めます。端末から本を探してダウンロードし、端末でもブラウザーでも続きから読み進められます。",
+  "intro": "Kobo や Kindle など KOReader を動かす電子書籍リーダーで本のライブラリを読めます。端末から本を探してダウンロードし、読んだ位置、読了状態、ハイライト、読書時間をブラウザやアプリと同期します。",
   "step1": "プラグインをダウンロードし、zip 内の <code>backissue.koplugin</code> フォルダーを端末の KOReader の <code>plugins</code> フォルダーにコピーしてから、KOReader を再起動します。",
   "step2": "KOReader で上部メニューを開き、<b>ツール</b> → <b>BackIssue</b> を選びます。サーバーアドレスは入力済みです。このページの <b>API キー</b> で作成した個人用キーを貼り付けてください。",
-  "step3": "<b>ライブラリを閲覧</b> から本をダウンロードします。読書位置は本を開いたときと閉じたときに同期されます。<b>自動同期</b> はそこでオフにできます。",
+  "step3": "<b>ライブラリを見る</b>から本をダウンロードします。位置、ハイライト、読書統計は本を開いたり閉じたりするたびに同期されます。<b>すべての本を同期</b>で以前の本も追いつき、同期の種類ごとにオフにできます。",
   "download": "KOReader プラグインをダウンロード",
+  "devices": "端末",
+  "noDevices": "まだ接続した端末はありません。",
+  "lastSeen": "最終接続 {when}",
+  "lastBook": "最後に読んだ本: {title}",
+  "pluginVersion": "プラグイン {version}",
+  "upToDate": "最新",
+  "updateAvailable": "{version} が利用可能です。端末で「プラグインの更新を確認」を選んでください",
+  "counts": "{books} 冊 · ハイライト {highlights} 件 · 読書イベント {events} 件",
+  "forget": "削除",
+  "forgetFailed": "この端末を削除できませんでした。",
+  "readingTime": "KOReader での読書時間",
+  "noReading": "まだ読書時間はありません。端末で本を閉じると届きます。",
+  "recentLine": "過去 {days} 日間に {sessions} 回、{time}",
+  "totalLine": "累計 {sessions} 回、{time}",
+  "hoursMinutes": "{h} 時間 {m} 分",
+  "minutes": "{m} 分",
+  "loadFailed": "KOReader の情報を読み込めませんでした。",
   "_shared": {
     "plugins": {
       "koreader": {
-        "description": "KOReader コンパニオン：電子書籍リーダーで本のライブラリを閲覧・ダウンロードし、読書位置を同期します。KOReader 端末どうしは正確な位置で、ウェブリーダーとはパーセントで同期します"
+        "description": "KOReader コンパニオン: 電子書籍リーダーで本のライブラリを閲覧・ダウンロードし、位置、読了状態、ハイライト、読書時間をウェブリーダーやアプリと同期します"
       }
     },
     "permissions": {

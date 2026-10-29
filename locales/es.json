@@ -1,14 +1,31 @@
 {
   "title": "KOReader",
-  "intro": "Lee tu biblioteca de libros en un Kobo, un Kindle u otro lector electrónico con KOReader: explora y descarga libros desde el dispositivo y retoma la lectura donde la dejaste, en el lector o en el navegador.",
+  "intro": "Lee tu biblioteca de Libros en un Kobo, Kindle u otro lector con KOReader: explora y descarga libros desde el dispositivo, y mantén tu posición, el estado de terminado, los subrayados y el tiempo de lectura sincronizados con el navegador y las apps.",
   "step1": "Descarga el plugin y copia la carpeta <code>backissue.koplugin</code> del zip en la carpeta <code>plugins</code> de KOReader en el dispositivo; después reinicia KOReader.",
   "step2": "En KOReader abre el menú superior y luego <b>Herramientas</b> → <b>BackIssue</b>. La dirección del servidor ya está rellenada; pega una clave personal creada en <b>Clave de API</b> en esta página.",
-  "step3": "Usa <b>Explorar biblioteca</b> para descargar libros. El progreso se sincroniza al abrir y cerrar un libro; la <b>sincronización automática</b> se puede desactivar ahí.",
+  "step3": "Usa <b>Explorar biblioteca</b> para descargar libros. Posiciones, subrayados y estadísticas de lectura se sincronizan al abrir y cerrar libros; <b>Sincronizar todos los libros</b> pone al día los antiguos, y cada tipo de sincronización se puede desactivar ahí.",
   "download": "Descargar el plugin de KOReader",
+  "devices": "Dispositivos",
+  "noDevices": "Ningún dispositivo se ha conectado todavía.",
+  "lastSeen": "Visto por última vez {when}",
+  "lastBook": "Última lectura: {title}",
+  "pluginVersion": "Complemento {version}",
+  "upToDate": "al día",
+  "updateAvailable": "{version} disponible, usa «Buscar actualización del complemento» en el dispositivo",
+  "counts": "{books} libros · {highlights} subrayados · {events} eventos de lectura",
+  "forget": "Olvidar",
+  "forgetFailed": "No se pudo olvidar este dispositivo.",
+  "readingTime": "Tiempo de lectura en KOReader",
+  "noReading": "Aún no hay tiempo de lectura. Llega después de cerrar un libro en el dispositivo.",
+  "recentLine": "{time} en {sessions} sesiones en los últimos {days} días",
+  "totalLine": "{time} en {sessions} sesiones en total",
+  "hoursMinutes": "{h} h {m} min",
+  "minutes": "{m} min",
+  "loadFailed": "No se pudieron cargar los datos de KOReader.",
   "_shared": {
     "plugins": {
       "koreader": {
-        "description": "Compañero de KOReader: explora y descarga tu biblioteca de libros en un lector electrónico y mantén el progreso de lectura sincronizado, exacto entre dispositivos KOReader y por porcentaje con el lector web"
+        "description": "Compañero de KOReader: explora y descarga tu biblioteca de Libros en un lector electrónico, y mantén posiciones, estado de terminado, subrayados y tiempo de lectura sincronizados con el lector web y las apps"
       }
     },
     "permissions": {
