@@ -26,6 +26,19 @@ test('browse views: continue reading, authors, series, description', () => {
   assert.deepEqual(s.listBooks({ author: 'Gaiman' }).books, [], 'a whole name, not a fragment');
   assert.deepEqual(s.seriesList().map((x) => [x.id, x.title, x.books]), [[11, 'Discworld', 2]], 'a standalone book is not a series');
   assert.deepEqual(s.listBooks({ seriesId: 11 }).books.map((b) => b.title), ['Mort', 'Guards! Guards!'], 'in reading order');
+  // The grouped views carry this user's standing in each group.
+  const gaiman = s.authors({ userId: 7 }).find((a) => a.name === 'Neil Gaiman');
+  assert.deepEqual(gaiman, { name: 'Neil Gaiman', books: 2, finished: 0, reading: 2 });
+  assert.deepEqual(s.authors({ userId: 7 }).find((a) => a.name === 'Frank Herbert'), { name: 'Frank Herbert', books: 1, finished: 1, reading: 0 });
+  const disc = s.seriesList({ userId: 7 })[0];
+  assert.deepEqual([disc.statuses, disc.finished, disc.reading, disc.first_id, disc.cover], ['rr', 0, 2, 101, '/api/ebooks/issue/101/cover'], 'one letter per book in reading order');
+  assert.deepEqual(s.seriesList()[0].statuses, 'uu', 'another user has not opened them');
+  assert.deepEqual(s.counts({ userId: 7 }), { books: 4, finished: 1, reading: 2, unread: 1 });
+  assert.deepEqual(s.counts({ userId: 7, includeRestricted: false }), { books: 3, finished: 1, reading: 2, unread: 0 });
+  assert.deepEqual(s.listBooks({ userId: 7, unread: true }).books.map((b) => b.id), [103], 'unread: never opened');
+  const byRead = s.listBooks({ userId: 7, sort: 'read' }).books.map((b) => b.id);
+  assert.deepEqual([byRead.slice(0, 3).sort(), byRead[3]], [[100, 101, 102], 103], 'read books first (ties within a second fall to title), untouched last');
+  assert.deepEqual(s.listBooks({ sort: 'author' }).books.map((b) => b.id), [103, 100, 102, 101], 'by author, then title');
 });
 
 test('status: complete marks the book finished; a sweep skips stale positions; devices are noted', () => {

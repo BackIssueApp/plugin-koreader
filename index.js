@@ -129,22 +129,26 @@ export default async function register(api) {
     });
   }, OPTS);
 
-  // GET /api/koreader/books?q=&offset=&limit=&sort=title|recent|progress&author=&series=
+  // GET /api/koreader/books?q=&offset=&limit=&sort=title|recent|progress|read|author&author=&series=&finished=1&unread=1
   api.registerRoute('get', '/api/koreader/books', (req, res) => {
     seen(req);
     res.json(store.listBooks({
       userId: uid(req), q: req.query.q, offset: req.query.offset, limit: req.query.limit,
-      sort: ['recent', 'progress'].includes(req.query.sort) ? req.query.sort : 'title',
-      author: req.query.author, seriesId: req.query.series, finished: req.query.finished === '1', includeRestricted: canRestricted(req),
+      sort: ['recent', 'progress', 'read', 'author'].includes(req.query.sort) ? req.query.sort : 'title',
+      author: req.query.author, seriesId: req.query.series, finished: req.query.finished === '1', unread: req.query.unread === '1',
+      includeRestricted: canRestricted(req),
     }));
   }, OPTS);
 
-  // GET /api/koreader/authors, GET /api/koreader/series — the browse views.
+  // GET /api/koreader/authors, GET /api/koreader/series, GET /api/koreader/counts — the browse views.
   api.registerRoute('get', '/api/koreader/authors', (req, res) => {
-    res.json({ authors: store.authors({ includeRestricted: canRestricted(req) }) });
+    res.json({ authors: store.authors({ userId: uid(req), includeRestricted: canRestricted(req) }) });
   }, OPTS);
   api.registerRoute('get', '/api/koreader/series', (req, res) => {
-    res.json({ series: store.seriesList({ includeRestricted: canRestricted(req) }) });
+    res.json({ series: store.seriesList({ userId: uid(req), includeRestricted: canRestricted(req) }) });
+  }, OPTS);
+  api.registerRoute('get', '/api/koreader/counts', (req, res) => {
+    res.json(store.counts({ userId: uid(req), includeRestricted: canRestricted(req) }));
   }, OPTS);
 
   // GET /api/koreader/books/:id — one book, with its download path.

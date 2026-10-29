@@ -31,13 +31,16 @@ by the maintainers when changes merge, so concurrent PRs don't conflict here.
   card shows reading time by book, grouped into sittings.
 - **Sync all books** sweeps the reading history so books read before the
   plugin was installed are synced, with the server keeping any newer position.
-- A **Dashboard** on the device: rows of covers for books under way and the
-  newest, and buttons for all books, authors, series, on this device and
-  finished. Every list is a cover grid with paging; a tap opens a book page
-  with cover, metadata, progress and description, and Read / Download / Mark
-  finished buttons. Covers are scaled once and cached on the device.
-- Browse by **Continue reading**, **Authors** and **Series**; a book's page
-  shows its description.
+- A graphical library on the device with a bottom tab bar: **Home** lists
+  the books under way with their own Read or Get button, the newest
+  additions and a sync pill; **Library** is a cover grid with a sort control,
+  filter chips (all, on device, unread, finished) and a status chip on each
+  cover; the **book page** has a stat strip (progress, format and size, on
+  device or on server), a Resume / Read / Download button, Mark finished and
+  the description; **Authors** is a grouped list with an A–Z rail and read
+  counts; **Series** shows a status square per book. Without a connection,
+  Home lists the books under way on the device. Covers are scaled once and
+  cached on the device.
 - **Check for plugin update** installs the server's newer copy of the device
   plugin in place.
 - The Profile card lists the devices that have synced (plugin version, last

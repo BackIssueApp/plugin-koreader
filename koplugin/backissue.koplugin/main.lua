@@ -27,7 +27,6 @@ local Event = require("ui/event")
 local InfoMessage = require("ui/widget/infomessage")
 local InputDialog = require("ui/widget/inputdialog")
 local LuaSettings = require("luasettings")
-local Menu = require("ui/widget/menu")
 local NetworkMgr = require("ui/network/manager")
 local Notification = require("ui/widget/notification")
 local UIManager = require("ui/uimanager")
@@ -100,6 +99,7 @@ function BackIssue:init()
     end
     self.device_id = G_reader_settings:readSetting("device_id")
     self.last_push = 0
+    self.last_sync_at = tonumber(self.settings:readSetting("last_sync_at"))
     self.push_task = function() self:pushProgress({ auto = true }) end
     self.ui.menu:registerToMainMenu(self)
 end
@@ -151,24 +151,15 @@ function BackIssue:addToMainMenu(menu_items)
         sorting_hint = "tools",
         sub_item_table = {
             {
-                text = _("Dashboard"),
+                text = _("Home"),
+                help_text = _("The books under way, the newest additions, and tabs for the library, series and authors."),
                 enabled_func = configured,
-                callback = function() self:showDashboard() end,
+                callback = function() self:showHome() end,
             },
             {
                 text = _("Browse library"),
                 enabled_func = configured,
                 callback = function() self:browse({}) end,
-            },
-            {
-                text = _("Continue reading"),
-                enabled_func = configured,
-                callback = function() self:browse({ sort = "progress" }) end,
-            },
-            {
-                text = _("Recently added"),
-                enabled_func = configured,
-                callback = function() self:browse({ sort = "recent" }) end,
             },
             {
                 text = _("Authors"),
@@ -440,7 +431,7 @@ end
 -- ---- browsing and downloading ---------------------------------------------------
 
 function BackIssue:browse(opts)
-    NetworkMgr:runWhenOnline(function() self:showBooks(opts or {}) end)
+    UI.openTab(self, "library", opts or {})
 end
 
 function BackIssue:askSearch()
@@ -466,102 +457,27 @@ function BackIssue:askSearch()
 end
 
 function BackIssue:localPath(b)
+    if b.local_path then return b.local_path end
     local dir = self:downloadDir()
     local name = b.filename
     if not name or name == "" then name = (b.title or "book") .. "." .. (b.format or "epub") end
     return dir .. "/" .. util.getSafeFilename(name, dir)
 end
 
-local function bookLine(b)
-    local head = ""
-    if b.series and b.series ~= "" then
-        head = b.series
-        if b.series_index and b.series_index ~= "" then head = head .. " " .. tostring(b.series_index) end
-        head = head .. ": "
-    end
-    local by = ""
-    if type(b.authors) == "table" and #b.authors > 0 then by = " — " .. table.concat(b.authors, ", ") end
-    return head .. (b.title or "?") .. by
-end
-
-function BackIssue:bookItems(state)
-    local items = {}
-    for _i, b in ipairs(state.books) do
-        local tags = {}
-        if b.finished then tags[#tags + 1] = _("finished")
-        elseif (tonumber(b.fraction) or 0) > 0 then tags[#tags + 1] = pct(b.fraction) .. "%" end
-        if b.format then tags[#tags + 1] = string.upper(b.format) end
-        if lfs.attributes(self:localPath(b), "mode") == "file" then tags[#tags + 1] = _("on device") end
-        items[#items + 1] = {
-            text = bookLine(b),
-            mandatory = table.concat(tags, " · "),
-            book = b,
-            callback = function() self:downloadBook(b) end,
-        }
-    end
-    if state.total > #state.books then
-        items[#items + 1] = {
-            text = T(_("More… (%1 of %2)"), #state.books, state.total),
-            bold = true,
-            callback = function() self:loadMore(state) end,
-        }
-    end
-    return items
-end
-
-function BackIssue:listTitle(state)
-    if state.q then return T(_("BackIssue: “%1”"), state.q) end
-    if state.author then return state.author end
-    if state.series_title then return state.series_title end
-    if state.on_device then return _("On this device") end
-    if state.finished then return _("Finished") end
-    if state.sort == "recent" then return _("Recently added") end
-    if state.sort == "progress" then return _("Continue reading") end
-    return _("BackIssue library")
-end
-
--- One list widget at a time; a tap acts on the item and keeps the list open
--- (Menu's own onMenuSelect would run close_callback after every choice).
-function BackIssue:showMenu(spec)
-    if self.menu then UIManager:close(self.menu) end
-    self.menu = Menu:new{
-        title = spec.title,
-        subtitle = spec.subtitle,
-        item_table = spec.items,
-        is_borderless = true,
-        is_popout = false,
-        title_bar_fm_style = true,
-        title_bar_left_icon = "appbar.search",
-        onLeftButtonTap = function() self:askSearch() end,
-        onMenuSelect = function(_menu, item)
-            if item.callback then item.callback() end
-            return true
-        end,
-        onMenuHold = function(_menu, item)
-            if item.book then self:showBookInfo(item.book) end
-            return true
-        end,
-        close_callback = function()
-            self.menu = nil
-            self.list_state = nil
-        end,
-    }
-    UIManager:show(self.menu)
-end
-
 function BackIssue:isOnDevice(b)
     return lfs.attributes(self:localPath(b), "mode") == "file"
 end
 
-function BackIssue:showDashboard()
-    NetworkMgr:runWhenOnline(function() UI.showDashboard(self) end)
+function BackIssue:showHome()
+    UI.showHome(self)
 end
 
 -- One page of a list from the server, appended to the state. Returns true,
 -- or nil and a message.
 function BackIssue:loadMoreInto(state)
     local list, err = self:client():books{
-        q = state.q, sort = state.sort, author = state.author, series = state.series, finished = state.finished and "1" or nil,
+        q = state.q, sort = state.sort, author = state.author, series = state.series,
+        finished = state.finished and "1" or nil, unread = state.unread and "1" or nil,
         limit = PAGE_SIZE, offset = state.fetched or 0,
     }
     if not list then
@@ -583,37 +499,9 @@ function BackIssue:loadMoreInto(state)
     return true
 end
 
-function BackIssue:showBooks(opts)
-    local state = {
-        q = opts.q, sort = opts.sort or "title", author = opts.author, series = opts.series, series_title = opts.series_title,
-        finished = opts.finished, on_device = opts.on_device, books = {}, total = 0,
-    }
-    if not self:loadMoreInto(state) then return end
-    if #state.books == 0 then
-        local text = _("The Books library is empty.")
-        if state.q then text = T(_("Nothing matches “%1”."), state.q)
-        elseif state.sort == "progress" then text = _("No book under way. Open one and read a little.")
-        elseif state.on_device then text = _("No library book is on this device yet.")
-        elseif state.finished then text = _("No finished book yet.") end
-        say(text)
-        return
-    end
-    self.list_state = state
-    state.title = self:listTitle(state)
-    state.subtitle = T(_("%1 books"), state.total)
-    UI.showGrid(self, state)
-end
-
-function BackIssue:loadMore(state)
-    if self:loadMoreInto(state) then self:refreshList() end
-end
-
--- Rebuild the open list (a download changes the "on device" tags).
+-- Rebuild the open screens (a download or a status change moves a chip).
 function BackIssue:refreshList()
-    if self.grid then self.grid:refresh() end
-    if self.menu and self.list_state then
-        self.menu:switchItemTable(self:listTitle(self.list_state), self:bookItems(self.list_state), -1, nil, T(_("%1 books"), self.list_state.total))
-    end
+    UI.refreshAll(self)
 end
 
 -- Finished or not, on the server; the book's own record follows.
@@ -630,62 +518,22 @@ function BackIssue:setFinished(b, finished, after)
         end
         b.finished = finished
         b.fraction = p.fraction
+        self:markSynced()
         UIManager:show(Notification:new{ text = finished and _("Marked finished") or _("Marked unread") })
         if after then after() end
     end)
 end
 
 function BackIssue:browseAuthors()
-    NetworkMgr:runWhenOnline(function()
-        local r, err = self:client():authors()
-        if not r then
-            say(T(_("Could not list authors: %1"), err or "?"))
-            return
-        end
-        local items = {}
-        for _i, a in ipairs(r.authors or {}) do
-            items[#items + 1] = {
-                text = a.name,
-                mandatory = tostring(a.books or ""),
-                callback = function() self:showBooks({ author = a.name }) end,
-            }
-        end
-        if #items == 0 then
-            say(_("The Books library is empty."))
-            return
-        end
-        self.list_state = nil
-        self:showMenu{ title = _("BackIssue: authors"), subtitle = T(_("%1 authors"), #items), items = items }
-    end)
+    UI.openTab(self, "authors")
 end
 
 function BackIssue:browseSeries()
-    NetworkMgr:runWhenOnline(function()
-        local r, err = self:client():series()
-        if not r then
-            say(T(_("Could not list series: %1"), err or "?"))
-            return
-        end
-        local items = {}
-        for _i, s in ipairs(r.series or {}) do
-            local by = type(s.authors) == "table" and #s.authors > 0 and (" — " .. table.concat(s.authors, ", ")) or ""
-            items[#items + 1] = {
-                text = (s.title or "?") .. by,
-                mandatory = tostring(s.books or ""),
-                callback = function() self:showBooks({ series = s.id, series_title = s.title }) end,
-            }
-        end
-        if #items == 0 then
-            say(_("No series in the Books library yet."))
-            return
-        end
-        self.list_state = nil
-        self:showMenu{ title = _("BackIssue: series"), subtitle = T(_("%1 series"), #items), items = items }
-    end)
+    UI.openTab(self, "series")
 end
 
 function BackIssue:showBookInfo(b)
-    UI.showBook(self, b, self.grid or self.dashboard)
+    UI.showBook(self, b)
 end
 
 function BackIssue:showBookInfoText(b)
@@ -731,7 +579,7 @@ function BackIssue:downloadBook(b)
     })
 end
 
-function BackIssue:fetchBook(b, path, after)
+function BackIssue:fetchBook(b, path, after, mode)
     local info = InfoMessage:new{ text = T(_("Downloading %1…"), b.title or "?") }
     UIManager:show(info)
     -- Let the message paint before the blocking download starts.
@@ -743,9 +591,14 @@ function BackIssue:fetchBook(b, path, after)
             return
         end
         self:remember(path, b.id)
+        if self.ui.file_chooser then self.ui.file_chooser:refreshPath() end
+        if mode == "open" then
+            self:openBook(path, b.id)
+            return
+        end
         self:refreshList()
         if after then after() end
-        if self.ui.file_chooser then self.ui.file_chooser:refreshPath() end
+        if mode == "quiet" then return end
         UIManager:show(ConfirmBox:new{
             text = T(_("Downloaded %1.\nRead it now?"), b.title or "?"),
             ok_text = _("Read now"),
@@ -764,10 +617,7 @@ function BackIssue:remember(path, issue_id)
 end
 
 function BackIssue:openBook(path, issue_id)
-    if self.menu then
-        UIManager:close(self.menu)
-        self.menu = nil
-    end
+    UI.closeAll(self)
     if issue_id then self:remember(path, issue_id) end
     if self.ui.document then
         self.ui:switchDocument(path)
@@ -879,6 +729,16 @@ end
 
 --- opts.interactive: asked from the menu (always runs, reports back);
 -- opts.auto: a timer or lifecycle push (rate limited, silent).
+-- A sync with the server succeeded just now: remembered for the Home
+-- screen's pill and, with `ds`, in that book's sidecar for its page.
+function BackIssue:markSynced(ds)
+    local now = os.time()
+    self.last_sync_at = now
+    self.sync_failed = nil
+    self.settings:saveSetting("last_sync_at", now)
+    if ds then ds:saveSetting("backissue_synced_at", now) end
+end
+
 function BackIssue:pushProgress(opts)
     opts = opts or {}
     if not self.ui.document or not self:isConfigured() then return end
@@ -901,6 +761,7 @@ function BackIssue:pushProgress(opts)
     self.last_push = os.time()
     if ok then
         self.last_pushed = p.position
+        self:markSynced(self.ui.doc_settings)
         if opts.interactive then say(T(_("Progress pushed: %1%."), pct(p.fraction)), 2) end
     else
         logger.warn("BackIssue: push failed:", err)
@@ -927,6 +788,7 @@ function BackIssue:pullProgress(opts)
         return
     end
     local remote = res.progress
+    self:markSynced(self.ui.doc_settings)
     if not remote then
         if opts.interactive then say(_("No progress on the server yet.")) end
         return
@@ -1286,17 +1148,25 @@ end
 -- (unless the server's is newer), status, highlights, reading time.
 function BackIssue:syncAll()
     NetworkMgr:runWhenOnline(function()
+        if self.syncing then return end
+        self.syncing = true
+        UI.refreshAll(self)
         local info = InfoMessage:new{ text = _("Syncing all books…") }
         UIManager:show(info)
         UIManager:scheduleIn(0.1, function()
             local ok, result = xpcall(function() return self:sweep() end, debug.traceback)
             UIManager:close(info)
+            self.syncing = nil
             if not ok then
+                self.sync_failed = true
+                UI.refreshAll(self)
                 logger.err("BackIssue: sync all failed:", result)
                 say(T(_("Sync all failed: %1"), tostring(result):match("^[^\n]*") or "?"))
                 return
             end
             local r = result
+            if r.failed > 0 and r.synced == 0 then self.sync_failed = true else self:markSynced() end
+            UI.refreshAll(self)
             local lines = { T(_("Synced %1 books."), r.synced) }
             if r.positions + r.skipped > 0 then lines[#lines + 1] = T(_("Positions sent: %1 (%2 already newer on the server)."), r.positions, r.skipped) end
             if r.highlights > 0 then lines[#lines + 1] = T(_("Highlights: %1 uploaded, %2 brought here."), r.highlights, r.hl_in) end
@@ -1352,7 +1222,11 @@ function BackIssue:sweep()
                         r.events = r.events + e
                     end
                 end)
-                if okb then r.synced = r.synced + 1 else
+                if okb then
+                    r.synced = r.synced + 1
+                    ds:saveSetting("backissue_synced_at", os.time())
+                    if not live then ds:flush() end
+                else
                     r.failed = r.failed + 1
                     logger.warn("BackIssue: sync failed for", path, berr)
                 end
@@ -1429,9 +1303,9 @@ local function guard(fn)
     end
 end
 for _i, name in ipairs({
-    "showBooks", "loadMore", "refreshList", "askSearch", "showBookInfo", "downloadBook", "browseAuthors", "browseSeries",
+    "browse", "refreshList", "askSearch", "showBookInfo", "downloadBook", "browseAuthors", "browseSeries",
     "openBook", "testConnection", "editText", "pushProgress", "pullProgress", "syncHighlightsNow", "syncAll",
-    "checkUpdate", "installUpdate", "pushEventsLater", "showDashboard", "setFinished", "fetchBook",
+    "checkUpdate", "installUpdate", "pushEventsLater", "showHome", "setFinished", "fetchBook",
     "onReaderReady", "onCloseDocument", "onSuspend", "onResume", "onNetworkConnected",
 }) do
     BackIssue[name] = guard(BackIssue[name])

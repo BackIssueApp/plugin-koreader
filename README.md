@@ -5,14 +5,16 @@ in step with it. The plugin has two halves: a BackIssue plugin that adds a
 small API and a card on your Profile page, and a KOReader plugin for the
 device, downloaded from that card with your server's address already inside.
 
-On the device, **Tools → BackIssue → Dashboard** opens a cover-led view of
-the library: a row of books under way, a row of the newest, and buttons for
-all books, authors, series, what is on this device and what is finished.
-Every list is a grid of covers with paging; a tap opens the book's page, with
-cover, author, series, format, progress and description, and buttons to read
-or download it and to mark it finished. A long press on a cover downloads at
-once. While you read, the plugin keeps BackIssue up to date, and brings back
-what changed elsewhere:
+On the device, **Tools → BackIssue → Home** opens the library with its
+covers on. Home lists the books you have under way, each with its own
+**Read** (or **Get**) button, and the newest additions; a bottom tab bar
+switches between **Home**, **Library**, **Series**, **Authors** and
+**Search**. The Library is a grid of covers with a sort control and filter
+chips (all, on device, unread, finished), each cover carrying its status; a
+tap opens the book's page, with cover, author, series, progress, format and
+size, description, and buttons to resume, read or download it and to mark it
+finished. A long press on a cover downloads at once. While you read, the
+plugin keeps BackIssue up to date, and brings back what changed elsewhere:
 
 - **Positions.** Between KOReader devices the position is exact (the same
   paragraph in an EPUB, the same page in a PDF); with the web reader and the
@@ -56,12 +58,15 @@ restart of KOReader finishes it.
 
 ## Use
 
-- **Dashboard** is the cover view described above. **Browse library**,
-  **Continue reading**, **Recently added**, **Authors**, **Series** and
-  **Search library** open the same cover grids directly; tap a cover for the
-  book's page, hold it to download at once. Covers are fetched once and kept
-  in KOReader's cache folder, scaled to the screen. Books already on the
-  device say so.
+- **Home** is the screen described above; its sync pill shows when the
+  device last synced and runs **Sync all books** on a tap. Without a
+  connection, Home still lists the books under way on the device so you can
+  keep reading. **Browse library**, **Authors**, **Series** and **Search
+  library** in the menu open the same tabs directly. **Authors** is a
+  grouped list with an A–Z rail and how many of each author's books you have
+  read; **Series** shows a square per book, filled as you finish them. Tap a
+  cover for the book's page, hold it to download at once. Covers are fetched
+  once and kept in KOReader's cache folder, scaled to the screen.
 - **Pull progress from server**, **Push progress to server** and **Sync
   highlights of this book** sync the open book by hand.
 - **Sync all books** sweeps the reading history: every book the server knows

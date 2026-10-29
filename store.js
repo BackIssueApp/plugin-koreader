@@ -157,12 +157,19 @@ export function openKoreaderStore(dbPath, { fingerprintFile } = {}) {
     return out.filter((x) => x.seconds >= SESSION_MIN_S).map((x) => ({ ...x, pages: x.pages.size }));
   };
 
+  // One row per book with where this user is in it, for the grouped views:
+  // 'f' finished, 'r' under way, 'u' untouched.
+  const statusRows = (userId, includeRestricted) => db.prepare(`SELECT ef.issue_id, i.issue_number, s.id AS series_id, s.title AS series_title,
+      s.url AS series_url, s.publisher, p.fraction ${BOOK_FROM(userId)}${includeRestricted ? '' : ' AND s.restricted = 0'}
+      ORDER BY s.title COLLATE NOCASE, CAST(i.issue_number AS REAL), i.title COLLATE NOCASE, ef.rowid`).all()
+    .map((r) => ({ ...r, st: (Number(r.fraction) || 0) >= FINISHED ? 'f' : (Number(r.fraction) || 0) > 0 ? 'r' : 'u' }));
+
   return {
     db,
     hasEbooks,
 
     /** One page of the Books library, as a device lists it. */
-    listBooks({ userId = 0, q = '', offset = 0, limit = 100, sort = 'title', author = '', seriesId = null, finished = false, includeRestricted = true } = {}) {
+    listBooks({ userId = 0, q = '', offset = 0, limit = 100, sort = 'title', author = '', seriesId = null, finished = false, unread = false, includeRestricted = true } = {}) {
       if (!hasEbooks()) return { total: 0, books: [] };
       const conds = [];
       const params = [];
@@ -186,9 +193,14 @@ export function openKoreaderStore(dbPath, { fingerprintFile } = {}) {
       // "progress": books under way, most recently read first.
       if (sort === 'progress') conds.push(`p.fraction > 0 AND p.fraction < ${FINISHED}`);
       if (finished) conds.push(`p.fraction >= ${FINISHED}`);
+      // "unread": never opened (no position, or one at the very start).
+      if (unread) conds.push('(p.fraction IS NULL OR p.fraction = 0)');
       const whereSql = conds.length ? ' AND ' + conds.join(' AND ') : '';
       const order = sort === 'recent' ? 'ORDER BY ef.added_at DESC, ef.rowid DESC'
         : sort === 'progress' ? 'ORDER BY p.updated_at DESC, ef.rowid DESC'
+        // "read": most recently read first, books never opened last.
+        : sort === 'read' ? 'ORDER BY (p.updated_at IS NULL), p.updated_at DESC, i.title COLLATE NOCASE, ef.rowid'
+        : sort === 'author' ? 'ORDER BY s.publisher COLLATE NOCASE, i.title COLLATE NOCASE, ef.rowid'
         : seriesId != null && seriesId !== '' ? 'ORDER BY CAST(i.issue_number AS REAL), i.title COLLATE NOCASE, ef.rowid'
         : 'ORDER BY i.title COLLATE NOCASE, ef.rowid';
       const lim = Math.min(500, Math.max(1, Number(limit) || 100));
@@ -206,29 +218,55 @@ export function openKoreaderStore(dbPath, { fingerprintFile } = {}) {
       return shapeBook(r);
     },
 
-    /** Authors with how many books each: [{ name, books }]. */
-    authors({ includeRestricted = true } = {}) {
+    /** Authors with how many books each, and how many of them this user has
+     *  finished or has under way: [{ name, books, finished, reading }]. */
+    authors({ userId = 0, includeRestricted = true } = {}) {
       if (!hasEbooks()) return [];
-      const rows = db.prepare(`SELECT s.publisher AS by, COUNT(*) c FROM ebooks_files ef
-        JOIN issues i ON i.id = ef.issue_id JOIN series s ON s.id = i.series_id
-        WHERE s.type = 'ebook'${includeRestricted ? '' : ' AND s.restricted = 0'} GROUP BY s.publisher`).all();
       const counts = new Map();
-      for (const r of rows) {
-        for (const name of String(r.by || '').split(',').map((a) => a.trim()).filter(Boolean)) {
-          counts.set(name, (counts.get(name) || 0) + r.c);
+      for (const r of statusRows(userId, includeRestricted)) {
+        for (const name of String(r.publisher || '').split(',').map((a) => a.trim()).filter(Boolean)) {
+          const c = counts.get(name) || { name, books: 0, finished: 0, reading: 0 };
+          c.books += 1;
+          if (r.st === 'f') c.finished += 1; else if (r.st === 'r') c.reading += 1;
+          counts.set(name, c);
         }
       }
-      return [...counts].map(([name, books]) => ({ name, books })).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+      return [...counts.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
     },
 
-    /** Multi-book series (a standalone book's own series is not one): [{ id, title, authors, books }]. */
-    seriesList({ includeRestricted = true } = {}) {
+    /** Multi-book series (a standalone book's own series is not one), in
+     *  title order: [{ id, title, authors, books, finished, reading,
+     *  statuses, cover }]. `statuses` is one letter per book in reading
+     *  order (f finished, r under way, u untouched); `first_id` and `cover`
+     *  are the first book's id and cover path. */
+    seriesList({ userId = 0, includeRestricted = true } = {}) {
       if (!hasEbooks()) return [];
-      return db.prepare(`SELECT s.id, s.title, s.publisher, COUNT(*) c FROM ebooks_files ef
-        JOIN issues i ON i.id = ef.issue_id JOIN series s ON s.id = i.series_id
-        WHERE s.type = 'ebook' AND s.url NOT LIKE 'ebook:l%:b:%'${includeRestricted ? '' : ' AND s.restricted = 0'}
-        GROUP BY s.id ORDER BY s.title COLLATE NOCASE`).all()
-        .map((r) => ({ id: r.id, title: r.title, authors: String(r.publisher || '').split(',').map((a) => a.trim()).filter(Boolean), books: r.c }));
+      const out = new Map();
+      for (const r of statusRows(userId, includeRestricted)) {
+        if (isStandalone(r.series_url)) continue;
+        const sr = out.get(r.series_id) || {
+          id: r.series_id, title: r.series_title,
+          authors: String(r.publisher || '').split(',').map((a) => a.trim()).filter(Boolean),
+          books: 0, finished: 0, reading: 0, statuses: '', first_id: r.issue_id, cover: `/api/ebooks/issue/${r.issue_id}/cover`,
+        };
+        sr.books += 1;
+        if (r.st === 'f') sr.finished += 1; else if (r.st === 'r') sr.reading += 1;
+        sr.statuses += r.st;
+        out.set(r.series_id, sr);
+      }
+      return [...out.values()];
+    },
+
+    /** How many books there are, and how many this user has finished, has
+     *  under way or has not opened: { books, finished, reading, unread }. */
+    counts({ userId = 0, includeRestricted = true } = {}) {
+      if (!hasEbooks()) return { books: 0, finished: 0, reading: 0, unread: 0 };
+      const r = db.prepare(`SELECT COUNT(*) books,
+        SUM(CASE WHEN p.fraction >= ${FINISHED} THEN 1 ELSE 0 END) finished,
+        SUM(CASE WHEN p.fraction > 0 AND p.fraction < ${FINISHED} THEN 1 ELSE 0 END) reading
+        ${BOOK_FROM(userId)}${includeRestricted ? '' : ' AND s.restricted = 0'}`).get();
+      const books = Number(r.books) || 0; const finished = Number(r.finished) || 0; const reading = Number(r.reading) || 0;
+      return { books, finished, reading, unread: books - finished - reading };
     },
 
     /** The newest position for a book across KOReader devices and the web

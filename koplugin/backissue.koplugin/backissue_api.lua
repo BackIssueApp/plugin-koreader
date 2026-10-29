@@ -167,21 +167,30 @@ function Api:me()
 end
 
 --- { total, books = { { id, title, authors, series, series_index, format,
--- size, library, remote, filename, fraction, finished, description,
--- download } } }. params: q, sort (title|recent|progress), author, series,
--- offset, limit.
+-- size, library, remote, filename, fraction, finished, last_read_at,
+-- description, download, cover } } }. params: q, sort
+-- (title|recent|progress|read|author), author, series, finished ("1"),
+-- unread ("1"), offset, limit.
 function Api:books(params)
     return self:request("GET", "/api/koreader/books" .. query(params))
 end
 
---- { authors = { { name, books } } }
+--- { authors = { { name, books, finished, reading } } }
 function Api:authors()
     return self:request("GET", "/api/koreader/authors")
 end
 
---- { series = { { id, title, authors, books } } }
+--- { series = { { id, title, authors, books, finished, reading, statuses, first_id, cover } } }
+-- `statuses` has one letter per book in reading order: f finished, r under
+-- way, u untouched.
 function Api:series()
     return self:request("GET", "/api/koreader/series")
+end
+
+--- { books, finished, reading, unread }: how many books, and this user's
+-- standing in them.
+function Api:counts()
+    return self:request("GET", "/api/koreader/counts")
 end
 
 function Api:book(id)
