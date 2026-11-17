@@ -8,6 +8,8 @@ by the maintainers when changes merge, so concurrent PRs don't conflict here.
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-11-17
+
 ### Fixed
 
 - **Reading time uploads from the device are smaller.** A book with many unsynced page turns

@@ -39,7 +39,7 @@ local T = require("ffi/util").template
 local Api = require("backissue_api")
 local UI = require("backissue_ui")
 
-local PLUGIN_VERSION = "0.1.0"
+local PLUGIN_VERSION = "0.1.1"
 local PAGE_SIZE = 200          -- books fetched per list page
 local PUSH_DEBOUNCE_S = 10     -- push this long after the last page turn
 local PUSH_MIN_INTERVAL_S = 25 -- and never more often than this, unless asked

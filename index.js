@@ -15,7 +15,7 @@ import { openKoreaderStore } from './store.js';
 import { fingerprintFile } from './fingerprint.js';
 import { buildPluginZip } from './bundle.js';
 
-const PLUGIN_VERSION = '0.1.0';
+const PLUGIN_VERSION = '0.1.1';
 
 export default async function register(api) {
   const CAN = api.registerPermission ? 'koreader.use' : 'viewer';
