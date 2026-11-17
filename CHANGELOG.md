@@ -8,6 +8,13 @@ by the maintainers when changes merge, so concurrent PRs don't conflict here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Reading time uploads from the device are smaller.** A book with many unsynced page turns
+  is now uploaded 1,000 events at a time instead of 2,000, so the upload stays under the body
+  size a BackIssue server before 0.9.5 accepts; with 2,000 the upload was rejected on every
+  sync and that book's reading time never reached the server.
+
 ## [0.1.0] — 2026-10-29
 
 ### Added

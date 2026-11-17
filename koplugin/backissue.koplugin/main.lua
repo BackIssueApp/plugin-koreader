@@ -46,7 +46,7 @@ local PUSH_MIN_INTERVAL_S = 25 -- and never more often than this, unless asked
 local MISS_RETRY_S = 86400     -- a book the server didn't know: ask again after a day
 local FINGERPRINT_WINDOW = 65536
 local SWEEP_MAX_BOOKS = 200    -- how far back in the reading history a sweep goes
-local EVENTS_BATCH = 2000      -- page events per upload
+local EVENTS_BATCH = 1000      -- page events per upload (~60 KB: under the 100 KB body cap of servers before 0.9.5)
 local STATS_DB = DataStorage:getSettingsDir() .. "/statistics.sqlite3"
 local KO_COLORS = { red = true, orange = true, yellow = true, green = true, olive = true, cyan = true, blue = true, purple = true, gray = true }
 
